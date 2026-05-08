@@ -2,9 +2,10 @@ import pandas as pd
 from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 
+url = "https://raw.githubusercontent.com/GO-atheneum-De-Tandem/intro-dash-daq-Pimguin77/refs/heads/master/immigrati_00003_stranieri_seriecittaprovenienza%20(1).csv"
 # CSV laden
 df = pd.read_csv(
-    "immigrati_00003_stranieri_seriecittaprovenienza (1).csv",
+    url,
     sep=";",
     encoding="latin-1"
 )
