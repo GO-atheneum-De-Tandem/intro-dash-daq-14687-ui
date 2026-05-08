@@ -1,42 +1,65 @@
-# Import packages
-from dash import Dash, State, dcc, Input, Output
-import dash_bootstrap_components as dbc
+import pandas as pd
+from dash import Dash, dcc, html, Input, Output
+import plotly.express as px
 
-# Initialise the App
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# CSV laden
+df = pd.read_csv(
+    "immigrati_00003_stranieri_seriecittaprovenienza (1).csv",
+    sep=";",
+    encoding="latin-1"
+)
+
+df["Numero Immigrati"] = pd.to_numeric(df["Numero Immigrati"], errors="coerce")
+
+# Pivot
+df_pivot = df.pivot_table(
+    index="Anno",
+    columns="Cittadinanza",
+    values="Numero Immigrati",
+    aggfunc="sum",
+    fill_value=0
+)
+
+years = sorted(df_pivot.index.tolist())
+
+app = Dash(__name__)
+
 server = app.server
-# Create app components
-markdown = dcc.Markdown(id='our-markdown', children='Text', style={'fontSize': 24})
-selector = dcc.RadioItems(id='our-colorselector',
-                            options=[
-                                {'label': 'Red', 'value': 'red'},
-                                {'label': 'Green', 'value': 'green'},
-                                {'label': 'Blue', 'value': 'blue'}
-                            ], value='red')
 
-# App Layout
-app.layout = dbc.Container(
-    [
-        dbc.Row([dbc.Col([markdown], width=8)]),
-        dbc.Row(
-            [
-                dbc.Col([selector], width=9),
-            ]
-        ),
-    ]
-)
+app.layout = html.Div([
+    html.H1("Immigranten per land"),
 
-# Callbacks
+    dcc.Slider(
+        id="year-slider",
+        min=min(years),
+        max=max(years),
+        step=1,
+        value=min(years),
+        marks={int(y): str(y) for y in years}
+    ),
+
+    dcc.Graph(id="bar-chart")
+])
+
+
 @app.callback(
-    Output(component_id='our-markdown', component_property='style'),
-    Input(component_id='our-colorselector', component_property='value'),
-    State(component_id='our-markdown', component_property='style')
+    Output("bar-chart", "figure"),
+    Input("year-slider", "value")
 )
-def update_markdown(value_selector, current_style):
-    style = current_style.copy()
-    style['color'] = value_selector
-    return style
+def update_graph(year):
+    data = df_pivot.loc[year].sort_values(ascending=False).head(10)
 
-# Run the App
-if __name__ == '__main__':
+    fig = px.bar(
+        x=data.values,
+        y=data.index,
+        orientation='h',
+        labels={"x": "Aantal immigranten", "y": "Land"},
+        title=f"Aantal immigranten - {year}"
+    )
+
+    fig.update_layout(yaxis={'categoryorder':'total ascending'})
+
+    return fig
+
+if __name__ == "__main__":
     app.run(debug=True)
