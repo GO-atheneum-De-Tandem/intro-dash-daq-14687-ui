@@ -25,7 +25,7 @@ years = sorted(df_pivot.index.tolist())
 
 app = Dash(__name__)
 
-server = app.server
+server = app.barchart.server
 
 app.layout = html.Div([
     html.H1("Immigranten per land"),
