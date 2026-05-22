@@ -11,6 +11,9 @@ df = pd.read_csv(
 )
 
 df["Numero Immigrati"] = pd.to_numeric(df["Numero Immigrati"], errors="coerce")
+df["Anno"] = pd.to_numeric(df["Anno"], errors="coerce")
+df = df.dropna(subset=["Anno", "Numero Immigrati"])
+df["Anno"] = df["Anno"].astype(int)
 
 # Pivot
 df_pivot = df.pivot_table(
