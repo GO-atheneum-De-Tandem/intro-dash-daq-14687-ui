@@ -77,10 +77,10 @@ def update_graph(year):
         title=f"Aantal immigranten - {year}"
     )
 
-fig.update_layout(
+    fig.update_layout(
     yaxis={'categoryorder':'total ascending'},
     xaxis=dict(range=[0, max_x])
-)
+    )
     return fig
 
 if __name__ == "__main__":
