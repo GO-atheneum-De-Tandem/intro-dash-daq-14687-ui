@@ -80,7 +80,7 @@ def update_graph(year):
 fig.update_layout(
     yaxis={'categoryorder':'total ascending'},
     xaxis=dict(range=[0, max_x])
-
+)
     return fig
 
 if __name__ == "__main__":
