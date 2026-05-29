@@ -54,7 +54,7 @@ app.layout = html.Div([
 from dash.dependencies import State
 
 
-app.callback(
+@app.callback(
     Output("year-slider", "value"),
     Input("interval-component", "n_intervals"),
     State("year-slider", "value")
@@ -77,11 +77,11 @@ def update_graph(year):
         title=f"Aantal immigranten - {year}"
     )
 
-fig.update_layout(
+    fig.update_layout(
     yaxis={'categoryorder':'total ascending'},
     xaxis=dict(range=[0, max_x])
     )
-return fig
+    return fig
 
 if __name__ == "__main__":
     app.run(debug=True)
