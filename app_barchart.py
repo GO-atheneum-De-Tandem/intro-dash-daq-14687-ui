@@ -26,6 +26,8 @@ df_pivot = df.pivot_table(
 
 years = sorted(df_pivot.index.tolist())
 
+max_x = df_pivot.max().max()
+
 app = Dash(__name__)
 
 server = app.server
@@ -41,14 +43,28 @@ app.layout = html.Div([
         value=min(years),
         marks={int(y): str(y) for y in years}
     ),
+    dcc.Interval(
+    id="interval-component",
+    interval=1000,  # elke 1 seconde
+    n_intervals=0
+),
 
     dcc.Graph(id="bar-chart")
 ])
+from dash.dependencies import State
 
 
-@app.callback(
-    Output("bar-chart", "figure"),
-    Input("year-slider", "value")
+app.callback(
+    Output("year-slider", "value"),
+    Input("interval-component", "n_intervals"),
+    State("year-slider", "value")
+)
+def update_slider(n, current_year):
+    current_index = years.index(current_year)
+
+    next_index = (current_index + 1) % len(years)
+
+    return years[next_index]
 )
 def update_graph(year):
     data = df_pivot.loc[year].sort_values(ascending=False).head(10)
@@ -61,7 +77,9 @@ def update_graph(year):
         title=f"Aantal immigranten - {year}"
     )
 
-    fig.update_layout(yaxis={'categoryorder':'total ascending'})
+fig.update_layout(
+    yaxis={'categoryorder':'total ascending'},
+    xaxis=dict(range=[0, max_x])
 
     return fig
 
