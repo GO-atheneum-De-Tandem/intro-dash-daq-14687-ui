@@ -65,7 +65,7 @@ def update_slider(n, current_year):
     next_index = (current_index + 1) % len(years)
 
     return years[next_index]
-)
+    
 def update_graph(year):
     data = df_pivot.loc[year].sort_values(ascending=False).head(10)
 
